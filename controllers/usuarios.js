@@ -4,11 +4,36 @@ const {generarJWT} = require('../helpers/jwt');
 
 const getUsuarios = async (req, res) => {
 
-    const usuarios = await Usuario.find();
+    const desde = Number(req.query.desde) || 0; // La paginación es muy importante ya que si madamos todos los
+        // elementos de una base de datos es un desperdicio de recursos.
 
+                                    /*  IMPORTANTE   */
+    /*Las siguientes lineas son unas peticiones sincronas ya que estamos utilizando el awaait pero en 
+    este caso no es necesario ya que la primera no depende de la otra y en este caso lo que podemos hacer
+    es por ejecutar al mismo tiempor las dos mismas peticiones utilizando la promesa que nos proporsiona 
+    el emaScript 6. */
+
+    // const usuarios = await Usuario.find()
+    //                                 .skip(desde) // De aqui empezara a seleccionar los elementos
+    //                                 .limit(5); // hazta donde llegara los elementos selecionados
+    // const totalRegistros = await Usuario.count();
+
+
+    /* En la siguiente promesa lo que estamos haciendo es ejecutar las dos peticiones simultaneamente, ya que ninguna 
+    depende de la otra, y asi es mas rapido que un funcion normal en await, ya que eso los ultilizamos cuando una depende 
+    del valor de la otra para ejecutarse, los valores de la siguiente  Promesa, se extraen de forma de un arreglo
+    segun la posición de la funcion, y en este caso estamos utilizando la desctructuración para extraer los valores */
+
+    const [usuarios, total] = await Promise.all([
+        Usuario.find().skip(desde).limit(5),
+        Usuario.countDocuments()
+    ]);
+
+                                    
     res.status(200).json({
         ok: true,
-        usuarios
+        usuarios,
+        total
     });
 }
 
