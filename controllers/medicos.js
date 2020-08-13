@@ -1,3 +1,4 @@
+const { findByIdAndRemove } = require('../models/medico');
 const Medico = require('../models/medico');
 
 const getMedicos = async(req,res) => {
@@ -21,6 +22,7 @@ const crearMedico = async(req,res) => {
 
     const medicoDB = await medico.save();
 
+
         res.status(200).json({
             ok:true,
             msg:'Medico creado exitosamente',
@@ -39,20 +41,76 @@ const crearMedico = async(req,res) => {
 
 }
 
-const actualizarMedico = (req,res) => {
-    res.status(200).json({
-        ok:true,
-        msg:' Actulizar Medico'
-    });
+const actualizarMedico = async (req,res) => {
+
+    const idMedico = req.params.id;
+    const uid = req.uid;
+
+    try{
+
+        const medicoDB = await Medico.findById(idMedico);
+
+        if(!medicoDB){
+            return res.status(400).json({
+                ok:false,
+                msg:'El id del Medico es Invalido'
+            });
+        }
+
+            const parametros = {
+                ...req.body,
+                usuario: uid
+            };
+
+            const nuevoMedico = await Medico.findByIdAndUpdate(idMedico, parametros, {new: true});
+            
+            res.status(200).json({
+                ok:true,
+                msg:'Datos del medico Actualizados',
+                nuevoMedico
+            });
+
+    }catch(error){
+        res.status(500).json({
+            ok:true,
+            msg:'Error en la petición del servicio',
+            error
+        });
+    }
 
 }
 
 
-const borrarMedico = (req,res) => {
+const borrarMedico = async(req,res) => {
+
+    const idMedico = req.params.id;
+
+    const medicoDB = await Medico.findById(idMedico);
+
+    if(!medicoDB){
+        return res.status(400).json({
+            ok:false,
+            msg:'El id del Medico es Invalido'
+        });
+    }
+
+
+    await Medico.findByIdAndRemove(idMedico);
+
     res.status(200).json({
         ok:true,
-        msg:' borrar Medico'
+        msg:'El medico se elimino exitosamente'
     });
+
+    try{
+
+    }catch(erro){
+        res.status(500).json({
+            ok:true,
+            msg:'Error al tratar de realizar la petición al servicio',
+            error
+        });
+    }
 
 }
 

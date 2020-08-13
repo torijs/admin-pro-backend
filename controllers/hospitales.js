@@ -35,7 +35,7 @@ const crearHospital = async (req,res) => {
     catch(error){
         console.log(error);
         res.status(500).json({
-            ok:true,
+            ok:false,
             msg:'Error, No se pudo crear un nuevo hospital',
             error
         });
@@ -44,20 +44,72 @@ const crearHospital = async (req,res) => {
 
 
 
-const actualizarHospital = (req,res) => {
-    res.status(200).json({
-        ok:true,
-        msg:' Actulizar hospital'
-    });
+const actualizarHospital = async(req,res) => {
 
+    const idHospital = req.params.id;
+    const uid = req.uid;
+
+    try{
+
+        const hospital = await Hospital.findById(idHospital);
+
+        if(!hospital){
+            return res.status(400).json({
+                ok:false,
+                msg:'El id del Hospital es Invalido'
+            });
+        }
+
+        const cambiosHospital = {
+            ...req.body,
+            usuario: uid
+        };
+
+        const hospitalActualizado = await Hospital.findByIdAndUpdate(idHospital, cambiosHospital, {new:true});
+
+        res.status(200).json({
+            ok:true,
+            msg:'Datos actualizados Exitosamente',
+            hospitalActualizado
+        });    
+    }
+    catch(error){
+        res.status(500).json({
+            ok:false,
+            msg:'Hay un error al tratar de realizar el servicio',
+            error
+        });    
+    }
 }
 
 
-const borrarHospital = (req,res) => {
-    res.status(200).json({
-        ok:true,
-        msg:' borrar hospital'
-    });
+const borrarHospital = async(req,res) => {
+
+    const id = req.params.id;
+
+    try{
+        const hospitalDB = Hospital.findById(id);
+        if(!hospitalDB){
+            res.status(400).json({
+                ok:false,
+                msg:'Id de hospital no encontrado'
+            });
+        }
+
+        await Hospital.findByIdAndDelete(id);
+        
+        res.status(200).json({
+            ok:false,
+            msg:'EL Hospital ha sido Eliminado Exitosamente',
+        });
+
+    }catch(error){
+        res.status(500).json({
+            ok:false,
+            msg:'Error al ejecutar el servicio',
+            error
+        });
+    }
 
 }
 

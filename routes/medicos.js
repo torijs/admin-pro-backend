@@ -15,8 +15,8 @@ router.post('/',[
     check('hospital', 'El ID del hospital es obligatorio').isMongoId(), // ESte validadción es pra asegurar que sea un id de  mongo
     validarCampos
 ] ,crearMedico);
-router.put('/', actualizarMedico),
-router.delete('/', borrarMedico);
+router.put('/:id', validarJWT, actualizarMedico),
+router.delete('/:id', validarJWT, borrarMedico);
 
 
 module.exports = router;
