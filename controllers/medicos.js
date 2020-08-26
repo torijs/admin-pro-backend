@@ -13,6 +13,26 @@ const getMedicos = async(req,res) => {
 
 }
 
+const getMedicoById = async(req,res) => {
+
+    const id = req.params.id;
+
+    try{
+        const medico = await Medico.findById(id).populate('usuario', 'nombre img').populate('hospital', 'nombre img');
+
+        res.status(200).json({
+            ok:true,
+            medico
+        });
+    }catch(error){
+        console.log(error);
+        res.status(500).json({
+            ok:false,
+        });
+    }
+
+}
+
 const crearMedico = async(req,res) => {
     const medico = new Medico({
         usuario: req.uid, // Aqui solo asignamos el id.
@@ -56,6 +76,8 @@ const actualizarMedico = async (req,res) => {
                 msg:'El id del Medico es Invalido'
             });
         }
+
+        console.log('info Backend : ', req.body);
 
             const parametros = {
                 ...req.body,
@@ -121,5 +143,6 @@ module.exports = {
     getMedicos,
     crearMedico,
     actualizarMedico,
-    borrarMedico
+    borrarMedico,
+    getMedicoById
 }
