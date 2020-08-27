@@ -1,7 +1,13 @@
+// modelos
 const Usuario = require('../models/usuario');
+
+// Encriptar
 const bcrypt = require('bcryptjs');
+
+// helpers
 const {generarJWT} = require('../helpers/jwt');
 const {googleVerify} = require('../helpers/google-verify');
+const {getMenuFrontEnd} = require('../helpers/menu-frontend');
 
 
 const login =  async(req,res) => {
@@ -34,7 +40,8 @@ const login =  async(req,res) => {
 
         res.status(200).json({
             ok:true,
-            token
+            token,
+            menu: getMenuFrontEnd(usuarioDB.role) // Aqui mandamos el role para que haga la verificacion y mande las rutas visibles
         })
     }
     catch(error){
@@ -82,7 +89,8 @@ const googleSignIn = async(req, res) => {
     res.status(200).json({
         ok:true,
         msg:'Google Sign-In',
-        token
+        token,
+        menu:getMenuFrontEnd(usuario.role)
     });
 
     }catch(error){   
@@ -107,7 +115,8 @@ const renewToken = async(req, res) =>{
         ok:true,
         msg:'Nuevo token Generado',
         token,
-        usuario
+        usuario,
+        menu:getMenuFrontEnd(usuario.role)
     });
 
 }

@@ -1,7 +1,7 @@
 const {Router} = require('express');
 const {check} = require('express-validator'); // Nos ayudadra para realizar las validaciones.
                                                // Los valores del error los recogemos en el controller por medio de otro metodo de la funcion. actualizarUsuario 
-const {validarJWT} = require('../middlewares/validar-jwt');
+const {validarJWT, validarADMIN_ROLE, validarADMIN_ROLE_o_MismoUsuario} = require('../middlewares/validar-jwt');
 const {validarCampos} = require('../middlewares/validar-campos');
 const {getUsuarios, crearUsuario, actualizarUsuario, borrarUsuario} = require('../controllers/usuarios');
 const router = Router();
@@ -16,6 +16,8 @@ router.post('/',[
     ] ,crearUsuario);
 router.put('/:id',[
     validarJWT,
+    //validarADMIN_ROLE, // lo ponemos despues, ya que en el aterior se  guarda el id que en este middleware se ocupa
+    validarADMIN_ROLE_o_MismoUsuario,
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('email', 'El Email es obligatorio').isEmail(),
     check('role', 'El Rol es obligatorio.').not().isEmpty(),
